@@ -21,6 +21,12 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=["airtight", "requests", "requests_cache", "validators"],
+    install_requires=[
+        "airtight",
+        "requests",
+        "requests_cache",
+        "textnorm",
+        "validators",
+    ],
     python_requires=">=3.10.2",
 )
