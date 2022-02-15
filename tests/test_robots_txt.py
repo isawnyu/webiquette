@@ -46,21 +46,3 @@ class TestAllowed:
         r = RobotsRules(netloc="pleiades.stoa.org", headers=DEFAULT_HEADERS)
         uri = "https://pleiades.stoa.org/places/295374"
         assert not r.allowed("istellabot", uri)
-
-
-#
-# def test_init_netloc_bad(self):
-#     with pytest.raises(ValueError):
-#         Webi(netloc="pleiades")
-#
-# def test_init_custom(self):
-#     netloc = "pleiades.stoa.org"
-#     headers = {
-#         "User-Agent": "CustomBot/7.9",
-#         "Referer": "http://nowhere.com/strange_brew",
-#     }
-#     respect = False
-#     w = Webi(netloc=netloc, headers=headers, respect_robots_txt=respect)
-#     assert w.netloc == netloc
-#     assert w.headers == headers
-#     assert w.respect_robots_txt == False
