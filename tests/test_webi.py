@@ -4,8 +4,12 @@
 Test the webiquette.webi module
 """
 
+from webiquette.robots_txt import RobotsDisallowedError
 from webiquette.webi import Webi, DEFAULT_HEADERS
 import pytest
+import requests_cache
+
+requests_cache.install_cache("tests/tests_cache")
 
 
 class TestInit:
@@ -35,3 +39,17 @@ class TestInit:
         assert w.netloc == netloc
         assert w.headers == headers
         assert w.respect_robots_txt == False
+
+
+class TestGet:
+    def test_get_allowed(self):
+        netloc = "pleiades.stoa.org"
+        w = Webi(netloc=netloc)
+        r = w.get("https://pleiades.stoa.org/places/295374")
+        assert r.status_code == 200
+
+    def test_get_disallowed(self):
+        netloc = "pleiades.stoa.org"
+        w = Webi(netloc=netloc)
+        with pytest.raises(RobotsDisallowedError):
+            r = w.get("https://pleiades.stoa.org/login_form")

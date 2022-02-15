@@ -13,6 +13,14 @@ import validators
 logger = logging.getLogger(__name__)
 
 
+class RobotsDisallowedError(Exception):
+    def __init__(self, user_agent, uri):
+        self.message = (
+            f"Access to {uri} disallowed for user-agent:{user_agent} by robots.txt."
+        )
+        super().__init__(self.message)
+
+
 class RobotsRules:
     """Parse and answer questions about rules in a robots.txt file for a particular netloc."""
 
