@@ -4,21 +4,23 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="{distribution-name}",
+    name="webiquette",
     version="0.0.1",
-    author="{author}",
-    author_email="{author-email}",
-    description="{short-description}",
-    license='MIT',
+    author="Tom Elliott",
+    author_email="tom.elliott@nyu.edu",
+    description=(
+        "Wraps 'requests' and 'requests_cache' for automagical (but configurable) "
+        "client-side caching, robots.txt compliance, and other good-citizen behavior "
+        "for bots, scrapers, and scripts."
+    ),
     long_description=long_description,
     long_description_content_type="text/markdown",
-    {project-url}
     packages=setuptools.find_packages(),
     classifiers=[
-        "Programming Language :: Python :: {pyver}",
+        "Programming Language :: Python :: 3.10.2",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=['airtight'],
-    python_requires='>={pyver}'
+    install_requires=["airtight", "requests", "requests_cache", "validators"],
+    python_requires=">=3.10.2",
 )
