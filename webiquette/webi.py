@@ -16,7 +16,7 @@ import validators
 from webiquette.robots_txt import RobotsRules, RobotsDisallowedError
 
 DEFAULT_CACHE_DIR = "data/cache/"
-DEFAULT_EXPIRE_AFTER = timedelta(months=1)
+DEFAULT_EXPIRE_AFTER = timedelta(days=30)
 DEFAULT_HEADERS = {"User-Agent": "Webiquette/0.1"}
 logger = logging.getLogger(__name__)
 
