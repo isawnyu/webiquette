@@ -132,6 +132,10 @@ venv.bak/
 
 # direnv
 .direnv
+.envrc
+
+# vscode
+.vscode
 
 # elliott stuff
 *.bak
