@@ -38,9 +38,14 @@ class Webi:
             else:
                 break
         try:
-            self.user_agent
+            ua = self.user_agent
         except AttributeError:
             raise ValueError("Headers did not include User-Agent.")
+        else:
+            if ua.strip() == "":
+                raise ValueError(
+                    "Headers contained blank/whitespace-only user-agent string."
+                )
         self.respect_robots_txt = bool(respect_robots_txt)
         if respect_robots_txt:
             self.robots_rules = RobotsRules(netloc=self.netloc, headers=self.headers)
