@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="webiquette",
-    version="0.0.1",
+    version="0.1",
     author="Tom Elliott",
     author_email="tom.elliott@nyu.edu",
     description=(
