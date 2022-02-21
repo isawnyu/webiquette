@@ -12,6 +12,7 @@ import logging
 import requests
 import requests_cache
 from textnorm import normalize_space, normalize_unicode
+import time
 import validators
 from webiquette.robots_txt import RobotsRules, RobotsDisallowedError
 
@@ -23,6 +24,17 @@ logger = logging.getLogger(__name__)
 
 def norm(s: str):
     return normalize_space(normalize_unicode(s))
+
+
+def make_throttle_hook(timeout=1.0):
+    """Make a request hook function that adds a custom delay for non-cached requests"""
+
+    def hook(response, *args, **kwargs):
+        if not getattr(response, "from_cache", False):
+            time.sleep(timeout)
+        return response
+
+    return hook
 
 
 class Webi:
@@ -90,6 +102,16 @@ class Webi:
                 cache_path, cache_control=cache_control, expire_after=expire_after
             )
 
+        # set up crawl-delay if needed
+        crawl_delay = self.robots_rules.crawl_delay(self.user_agent)
+        if crawl_delay > 0:
+            delay_seconds = (
+                float(crawl_delay) / 1000.0
+            )  # robots uses integer milliseconds; time.sleep uses float seconds
+            self.requests_session.hooks["response"].append(
+                make_throttle_hook(delay_seconds)
+            )
+
     def get(self, uri: str, additional_headers: dict = dict(), bypass_cache=False):
         """Use HTTP get to resolve URI, observing robots.txt rules and prefering cache."""
         if not validators.url(uri):
@@ -104,6 +126,9 @@ class Webi:
         else:
             headers = self.headers
         if bypass_cache:
-            return requests.get(uri, headers=headers)
+            r = requests.get(uri, headers=headers)
         else:
-            return self.requests_session.get(uri, headers=headers)
+            r = self.requests_session.get(uri, headers=headers)
+        if r.status_code != 200:
+            r.raise_for_status()
+        return r
