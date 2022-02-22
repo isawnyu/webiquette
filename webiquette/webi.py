@@ -103,7 +103,10 @@ class Webi:
             )
 
         # set up crawl-delay if needed
-        crawl_delay = self.robots_rules.crawl_delay(self.user_agent)
+        try:
+            crawl_delay = self.robots_rules.crawl_delay(self.user_agent)
+        except AttributeError:
+            crawl_delay = 0
         if crawl_delay > 0:
             delay_seconds = (
                 float(crawl_delay) / 1000.0
