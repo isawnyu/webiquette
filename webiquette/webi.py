@@ -161,3 +161,4 @@ class Webi:
             r = requests.get(uri, headers=headers)
         else:
             r = self.requests_session.get(uri, headers=headers)
+        return r
