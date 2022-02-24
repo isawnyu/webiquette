@@ -153,7 +153,7 @@ class Webi:
                 break
         if r.status_code != 200:
             r.raise_for_status()
-        logger.debug(f"Response headers:\n{pformat(r['headers'], indent=4)}")
+        logger.debug(f"Response headers:\n{pformat(r.headers, indent=4)}")
         return r
 
     def _get(self, uri, headers, bypass_cache):
