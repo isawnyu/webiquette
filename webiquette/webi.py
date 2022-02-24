@@ -4,11 +4,11 @@
 Define the Webi class
 """
 
-from audioop import add
 from copy import deepcopy
 from datetime import timedelta
-from functools import cache
+from http.client import RemoteDisconnected
 import logging
+from pprint import pformat
 import requests
 import requests_cache
 from textnorm import normalize_space, normalize_unicode
@@ -115,7 +115,14 @@ class Webi:
                 make_throttle_hook(delay_seconds)
             )
 
-    def get(self, uri: str, additional_headers: dict = dict(), bypass_cache=False):
+    def get(
+        self,
+        uri: str,
+        additional_headers: dict = dict(),
+        bypass_cache=False,
+        retries=4,
+        backoff_step=2,
+    ):
         """Use HTTP get to resolve URI, observing robots.txt rules and prefering cache."""
         if not validators.url(uri):
             raise ValueError(f"Invalid URI: '{uri}'.")
@@ -128,10 +135,29 @@ class Webi:
                 headers[k] = additional_headers[k]
         else:
             headers = self.headers
+        backoff = 1
+        tries = 0
+        while True:
+            try:
+                r = self._get(uri, headers, bypass_cache)
+            except RemoteDisconnected:
+                if tries >= retries:
+                    raise
+                tries += 1
+                backoff = backoff * backoff_step
+                logger.error(
+                    f"Remote server disconnected unexpectedly. Sleeping {backoff} seconds before retrying ..."
+                )
+                time.sleep(backoff)
+            else:
+                break
+        if r.status_code != 200:
+            r.raise_for_status()
+        logger.debug(f"Response headers:\n{pformat(r['headers'], indent=4)}")
+        return r
+
+    def _get(self, uri, headers, bypass_cache):
         if bypass_cache:
             r = requests.get(uri, headers=headers)
         else:
             r = self.requests_session.get(uri, headers=headers)
-        if r.status_code != 200:
-            r.raise_for_status()
-        return r
