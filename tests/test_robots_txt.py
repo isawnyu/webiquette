@@ -46,3 +46,10 @@ class TestAllowed:
         r = RobotsRules(netloc="pleiades.stoa.org", headers=DEFAULT_HEADERS)
         uri = "https://pleiades.stoa.org/places/295374"
         assert not r.allowed("istellabot", uri)
+
+
+class TestOneLinerRobots:
+    def test_idai(self):
+        r = RobotsRules(netloc="gazetteer.dainst.org", headers=DEFAULT_HEADERS)
+        assert isinstance(r.rules, dict)
+        assert isinstance(r.rules["*"], dict)

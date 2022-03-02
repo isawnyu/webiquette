@@ -5,6 +5,7 @@ Define RobotsTxt class
 """
 
 import logging
+from pprint import pprint
 import requests
 from textnorm import normalize_space
 from urllib.parse import urlparse, urlunparse
@@ -36,20 +37,29 @@ class RobotsRules:
         if r.status_code != 200:
             logger.warning(f"No robots.txt found for {netloc}.")
         else:
+            pprint(r.text)
             lines = [normalize_space(l) for l in r.text.split("\n")]
             lines = [l for l in lines if l != ""]
-            for line in lines:
-                k, v = [p.strip() for p in line.split(": ")]
-                k = k.lower()
-                if k == "user-agent":
-                    ua = v.lower()
-                    d[ua] = dict()
-                else:
-                    try:
-                        d[ua][k]
-                    except KeyError:
-                        d[ua][k] = list()
-                    d[ua][k].append(v)
+            if len(lines) == 1 and len(lines[0].split(":")) > 2:
+                lines = [normalize_space(l) for l in r.text.split("\\n")]  # idai
+            if len(lines) == 1 and len(lines[0].split(":")) > 2:
+                raise RuntimeError("only one line")
+            if len(lines) == 0:
+                logger.warning(f"Empty robots.txt found for {netloc}.")
+            else:
+                lines = [l.replace('"', "") for l in lines]  # idai
+                for line in lines:
+                    k, v = [p.strip() for p in line.split(": ")]
+                    k = k.lower()
+                    if k == "user-agent":
+                        ua = v.lower()
+                        d[ua] = dict()
+                    else:
+                        try:
+                            d[ua][k]
+                        except KeyError:
+                            d[ua][k] = list()
+                        d[ua][k].append(v)
         self.rules = d
 
     def allowed(self, user_agent: str, uri: str):
