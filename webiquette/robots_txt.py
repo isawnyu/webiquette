@@ -5,7 +5,6 @@ Define RobotsTxt class
 """
 
 import logging
-from pprint import pprint
 import requests
 from textnorm import normalize_space
 from urllib.parse import urlparse, urlunparse
@@ -37,7 +36,6 @@ class RobotsRules:
         if r.status_code != 200:
             logger.warning(f"No robots.txt found for {netloc}.")
         else:
-            pprint(r.text)
             lines = [normalize_space(l) for l in r.text.split("\n")]
             lines = [l for l in lines if l != ""]
             if len(lines) == 1 and len(lines[0].split(":")) > 2:
