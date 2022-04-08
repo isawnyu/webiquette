@@ -15,7 +15,7 @@ from datetime import timedelta
 from http.client import RemoteDisconnected
 import logging
 from pprint import pformat
-import requests
+from requests.exceptions import ConnectionError
 import requests_cache
 from textnorm import normalize_space, normalize_unicode
 import time
@@ -146,13 +146,13 @@ class Webi:
         while True:
             try:
                 r = self._get(uri, headers, bypass_cache)
-            except RemoteDisconnected:
+            except (ConnectionError, RemoteDisconnected):
                 if tries >= retries:
                     raise
                 tries += 1
                 backoff = backoff * backoff_step
                 logger.error(
-                    f"Remote server disconnected unexpectedly. Sleeping {backoff} seconds before retrying ..."
+                    f"Connection error with remote server. Sleeping {backoff} seconds before retrying ..."
                 )
                 time.sleep(backoff)
             else:
