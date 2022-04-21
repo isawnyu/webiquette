@@ -15,6 +15,7 @@ from datetime import timedelta
 from http.client import RemoteDisconnected
 import logging
 from pprint import pformat
+import requests
 from requests.exceptions import ConnectionError
 import requests_cache
 from textnorm import normalize_space, normalize_unicode
@@ -128,6 +129,7 @@ class Webi:
         bypass_cache=False,
         retries=4,
         backoff_step=2,
+        **kwargs,
     ):
         """Use HTTP get to resolve URI, observing robots.txt rules and prefering cache."""
         if not validators.url(uri):
@@ -145,7 +147,7 @@ class Webi:
         tries = 0
         while True:
             try:
-                r = self._get(uri, headers, bypass_cache)
+                r = self._get(uri, headers, bypass_cache, **kwargs)
             except (ConnectionError, RemoteDisconnected):
                 if tries >= retries:
                     raise
@@ -162,9 +164,9 @@ class Webi:
         logger.debug(f"Response headers:\n{pformat(r.headers, indent=4)}")
         return r
 
-    def _get(self, uri, headers, bypass_cache):
+    def _get(self, uri, headers, bypass_cache, **kwargs):
         if bypass_cache:
-            r = requests.get(uri, headers=headers)
+            r = requests.get(uri, headers=headers, **kwargs)
         else:
-            r = self.requests_session.get(uri, headers=headers)
+            r = self.requests_session.get(uri, headers=headers, **kwargs)
         return r
