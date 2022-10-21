@@ -35,5 +35,5 @@ setuptools.setup(
         "textnorm",
         "validators",
     ],
-    python_requires=">=3.10.2",
+    python_requires=">=3.6",
 )
