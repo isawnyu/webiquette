@@ -54,6 +54,7 @@ class Webi:
         respect_robots_txt: bool = True,
         cache_control=True,
         expire_after=DEFAULT_EXPIRE_AFTER,
+        cache_dir=DEFAULT_CACHE_DIR,
     ):
         if not validators.domain(netloc):
             raise ValueError(f"Invalid domain/netloc: '{netloc}'.")
@@ -92,7 +93,7 @@ class Webi:
             self.robots_rules = RobotsRules(netloc=self.netloc, headers=self.headers)
 
         # set up caching for this netloc
-        cache_path = DEFAULT_CACHE_DIR + netloc.replace(".", "_")
+        cache_path = cache_dir + netloc.replace(".", "_")
         # see https://requests-cache.readthedocs.io/en/stable/user_guide/expiration.html
         if not cache_control and not expire_after:
             self.requests_session = requests_cache.CachedSession(cache_path)
