@@ -58,3 +58,17 @@ class TestGet:
         w = Webi(netloc=netloc)
         with pytest.raises(RobotsDisallowedError):
             r = w.get("https://pleiades.stoa.org/login_form")
+
+
+class TestHead:
+    def test_head_allowed(self):
+        netloc = "pleiades.stoa.org"
+        w = Webi(netloc=netloc)
+        r = w.head("https://pleiades.stoa.org/places/295374")
+        assert r.status_code == 200
+
+    def test_head_disallowed(self):
+        netloc = "pleiades.stoa.org"
+        w = Webi(netloc=netloc)
+        with pytest.raises(RobotsDisallowedError):
+            r = w.head("https://pleiades.stoa.org/login_form")

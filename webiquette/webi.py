@@ -171,3 +171,52 @@ class Webi:
         else:
             r = self.requests_session.get(uri, headers=headers, **kwargs)
         return r
+
+    def head(
+        self,
+        uri: str,
+        additional_headers: dict = dict(),
+        bypass_cache=False,
+        retries=4,
+        backoff_step=2,
+        **kwargs,
+    ):
+        """Use HTTP get to resolve URI, observing robots.txt rules and prefering cache."""
+        if not validators.url(uri):
+            raise ValueError(f"Invalid URI: '{uri}'.")
+        if self.respect_robots_txt:
+            if not self.robots_rules.allowed(self.user_agent, uri):
+                raise RobotsDisallowedError(self.user_agent, uri)
+        if additional_headers:
+            headers = deepcopy(self.headers)
+            for k in additional_headers.keys():
+                headers[k] = additional_headers[k]
+        else:
+            headers = self.headers
+        backoff = 1
+        tries = 0
+        while True:
+            try:
+                r = self._head(uri, headers, bypass_cache, **kwargs)
+            except (ConnectionError, RemoteDisconnected):
+                if tries >= retries:
+                    raise
+                tries += 1
+                backoff = backoff * backoff_step
+                logger.error(
+                    f"Connection error with remote server. Sleeping {backoff} seconds before retrying ..."
+                )
+                time.sleep(backoff)
+            else:
+                break
+        if r.status_code != 200:
+            r.raise_for_status()
+        logger.debug(f"Response headers:\n{pformat(r.headers, indent=4)}")
+        return r
+
+    def _head(self, uri, headers, bypass_cache, **kwargs):
+        if bypass_cache:
+            r = requests.get(uri, headers=headers, **kwargs)
+        else:
+            r = self.requests_session.head(uri, headers=headers, **kwargs)
+        return r
