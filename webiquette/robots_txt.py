@@ -52,7 +52,15 @@ class RobotsRules:
             else:
                 lines = [l.replace('"', "") for l in lines]  # idai
                 for line in lines:
-                    k, v = [p.strip() for p in line.split(": ")]
+                    l = line.strip()
+                    if not l:
+                        continue
+                    if l[0] in ["﻿", "#"]:
+                        continue
+                    try:
+                        k, v = [p.strip() for p in l.split(":", 1)]
+                    except ValueError as e:
+                        raise ValueError(f"in line '{l}'") from e
                     k = k.lower()
                     if k == "user-agent":
                         ua = v.lower()
