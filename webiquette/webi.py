@@ -16,7 +16,7 @@ from http.client import RemoteDisconnected
 import logging
 from pprint import pformat
 import requests
-from requests.exceptions import ConnectionError
+from requests.exceptions import ChunkedEncodingError, ConnectionError
 import requests_cache
 from textnorm import normalize_space, normalize_unicode
 import time
@@ -169,7 +169,18 @@ class Webi:
         if bypass_cache:
             r = requests.get(uri, headers=headers, **kwargs)
         else:
-            r = self.requests_session.get(uri, headers=headers, **kwargs)
+            try:
+                r = self.requests_session.get(uri, headers=headers, **kwargs)
+            except ChunkedEncodingError as e:
+                logger.error(
+                    f"ChunkedEncodingError while attempting to get {uri} via "
+                    f"the established session. Trying a direct get, which "
+                    f"will bypass cache."
+                )
+                r = requests.get(uri, headers=headers, **kwargs)
+            except Exception as e:
+                logger.error(f"WTF:\n{str(e)}")
+                exit()
         return r
 
     def head(
