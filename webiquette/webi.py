@@ -93,7 +93,10 @@ class Webi:
             self.robots_rules = RobotsRules(netloc=self.netloc, headers=self.headers)
 
         # set up caching for this netloc
-        cache_path = cache_dir + netloc.replace(".", "_")
+        if cache_dir[-1] != "/":
+            cache_path = f"{cache_dir}/{neloc.replace('.', '_')}"
+        else:
+            cache_path = cache_dir + netloc.replace(".", "_")
         # see https://requests-cache.readthedocs.io/en/stable/user_guide/expiration.html
         if not cache_control and not expire_after:
             self.requests_session = requests_cache.CachedSession(cache_path)
