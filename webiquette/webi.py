@@ -182,8 +182,8 @@ class Webi:
                 )
                 r = requests.get(uri, headers=headers, **kwargs)
             except Exception as e:
-                logger.error(f"WTF:\n{str(e)}")
-                exit()
+                e.add_note(f"Requests error while attempting to get {uri} via session.")
+                raise e
         return r
 
     def head(
