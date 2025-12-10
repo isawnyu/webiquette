@@ -55,6 +55,7 @@ class Webi:
         cache_control=True,
         expire_after=DEFAULT_EXPIRE_AFTER,
         cache_dir=DEFAULT_CACHE_DIR,
+        cacheable_methods=("GET")
     ):
         if not validators.domain(netloc):
             raise ValueError(f"Invalid domain/netloc: '{netloc}'.")
@@ -99,18 +100,18 @@ class Webi:
             cache_path = cache_dir + netloc.replace(".", "_")
         # see https://requests-cache.readthedocs.io/en/stable/user_guide/expiration.html
         if not cache_control and not expire_after:
-            self.requests_session = requests_cache.CachedSession(cache_path)
+            self.requests_session = requests_cache.CachedSession(cache_path, cacheable_methods=cacheable_methods)
         elif cache_control and not expire_after:
             self.requests_session = requests_cache.CachedSession(
-                cache_path, cache_control=cache_control
+                cache_path, cache_control=cache_control, cacheable_methods=cacheable_methods
             )
         elif not cache_control and expire_after:
             self.requests_session = requests_cache.CachedSession(
-                cache_path, expire_after=expire_after
+                cache_path, expire_after=expire_after, cacheable_methods=cacheable_methods
             )
         else:
             self.requests_session = requests_cache.CachedSession(
-                cache_path, cache_control=cache_control, expire_after=expire_after
+                cache_path, cache_control=cache_control, expire_after=expire_after, cacheable_methods=cacheable_methods
             )
 
         # set up crawl-delay if needed
