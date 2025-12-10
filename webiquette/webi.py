@@ -55,7 +55,7 @@ class Webi:
         cache_control=True,
         expire_after=DEFAULT_EXPIRE_AFTER,
         cache_dir=DEFAULT_CACHE_DIR,
-        cacheable_methods=("GET")
+        cacheable_methods=["GET",]
     ):
         if not validators.domain(netloc):
             raise ValueError(f"Invalid domain/netloc: '{netloc}'.")
